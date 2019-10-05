@@ -206,7 +206,7 @@ function Dn(varargin)
  % neste momento est�o na directoria de trabalho a matriz P.mat e o vector ind.mat.
  % n�o usar este ficheiro para  a classifica��o; por isso comentar sempre a linha seguinte 
  
-           %  feval(options.fun,data);
+             feval(options.fun,data);
              
  % feval vai calcular a fun��o options.fun, que por defeito � a ocr_fun;
  % ocr_fun chama a fun��o myclassify que deve ser escrita pelo utilizador. 

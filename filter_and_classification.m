@@ -8,6 +8,9 @@
 % - One single layer with 256 inputs
 % - Linear activation
 % - Without bias
+% or
+% Binary perceptron with 256 hardlim neurons, for this give the associative
+% memory a target T of perfect characters. For train use trainc and learnp
 
 % Classifier 2nd layer:
 % - One single layer with 256 inputs 
@@ -26,12 +29,21 @@
 % Matrixes for training, validation and test were written in order
 % (1,2,3,4,5,6,7,8,9,0)
 
-function filter_and_classification()
+function filter_and_classification(act_func, epochs)
+
+    if ~exist('epochs','var')
+     % third parameter does not exist, so default it to something
+      epochs = 1000;
+ end
+
+    % Activation functions for the second layer
+    act_funcs = {'Hardlim' 'Linear' 'Sigmoidal'};
     
-     % Load required data
+    % Load required data
     load('PerfectArial.mat');
-    load('data/P_600.mat'); % train + validation
-    P = P_600;
+    load('data/P_650.mat'); % train + validation
+    P = P_650;
+    load('data/P_testing_set.mat');
     
     % Supervised Learning, so the corresponding outputs are required to
     % train the network
@@ -41,65 +53,81 @@ function filter_and_classification()
     for i = 0 : col - 1
         T(mod(i, 10) + 1, i + 1) = 1;
     end
-
-    act_functions = {'Hardlim' 'Linear' 'Sigmoidal' };
     
-    % Network architecture properties
-    net = perceptron;
-    
-    net.numInputs = 1; % Number of vectors that receives as input
-    net.numLayers = 2;
-    net.inputs{1}.size = 256; % Size of the input of the NN
-    net.layers{1}.size = 256; % Number of neurons in the layer
-    net.layers{2}.size = 10;
-    
+    % Perceptrons are simple single-layer binary classifiers, which divide
+    % the input space with a linear decision boundary.
+    net = perceptron('hardlim','learnp');
+    view(net)
     % First layer properties - Associative Memory
     %   - Perfect is a matrix 256x10 -> to 256x256
     %   - P (input matrix) is 256x500 
     T_Perfect = repmat(Perfect, 1, col/10);
     W = T_Perfect * pinv(P); % W - 256x256
-    net.IW{1,1} = W;
+    P = W * P;
     
-    net.biasConnect(i) = 0; % No bias
+    % Configure network inputs and outputs to best match input and target data
+    net = configure(net,P,T);
     
-    
-    % Second layer properties - Classifier
-    W = rand(10,256); 
+    % Initialize weights and bias with random values
+    W = rand(10,256);
     b = rand(10,1);
-    net.IW{2,1} = W; % Set random weights
-    net.b{2,1} = b; % Set random bias
+    net.IW{1,1}= W;
+    net.b{1,1} = b;
     
-    net.layers{2}.transferFcn = 'purelin' % Activation Function
+    % Data spliting (train and validation)
+    % Validation set prevents overfitting
+    net.divideParam.trainRatio = 85/100; 
+    net.divideParam.valRatio = 15/100; 
+    
+    % Training parameters
+    net.trainParam.epochs = 1000;
     
     
-    % Sub-object properties
     
+    if strcmpi(act_func,'hardlim')
     
-    % Training properties
-    net.performParam.lr = 0.5 % learning rate
-    net.trainParam.epochs = 1000 % Maximum epochs
-    net.trainParam.show = 35
-    net.trainParam.Fcn = 'sse'
-    
-    net.divideParam.trainRatio = 85/100
-    net.divideParam.valRatio = 15/100
-    
-    % net.trainFcn = 'trainml'
-    net.trainFcn = 'traingd'
+        net.performFcn = 'sse'; % Sum squared error
+        
+        % Train
+        [hardlimFilterClf, tr] = train(net,P ,T);
+        save('trained_nn/hardlimFilterClf','hardlimFilterClf');
+        save('trained_nn/tr_hardlimFilterClf','tr');
 
-    % Visualize Network
-    view(net)
+        % Test
+        %T_pred = sim(hardlimFilterClf, P_testing_set);
+        
+    elseif strcmpi(act_func,'linear')
     
-    % Train the Neural Network
-    %net = train(net,P,T)
-    
-    % Access Weights and Bias
-    % W = bet.IW{1,1}
-    % b = net.b{1,1}
-
-    % Test the Neural Network 
-    a = sim(net, PT)
-    
-    
+        net.layers{1}.transferFcn = 'purelin';
+        net.inputWeights{1}.learnFcn = 'learngd';       
+        net.biases{1}.learnFcn = 'learngd'; 
+        net.trainFcn = 'traingd';
+        net.performFcn = 'mse';
+        
+        % Train
+        [purelinFilterClf, tr] = train(net,P ,T);
+        save('trained_nn/purelinFilterClf','purelinFilterClf');
+        save('trained_nn/tr_purelinFilterClf','tr');
+        
+        % Test
+        %T_pred = sim(purelinFilterClf, P_testing_set);
+        
+    elseif strcmpi(act_func,'sigmoidal')
+        
+        net.layers{1}.transferFcn = 'logsig';
+        net.inputWeights{1}.learnFcn = 'learngd';       
+        net.biases{1}.learnFcn = 'learngd'; 
+        net.trainFcn = 'traingd';
+        net.performFcn = 'mse';
+        
+        % Train
+        [logsigFilterClf, tr] = train(net,P ,T);
+        save('trained_nn/logsigFilterClf','logsigFilterClf');
+        save('trained_nn/tr_logsigFilterClf','tr');
+        
+        % Test
+        %T_pred = sim(logsigFilterClff, P_testing_set);
+        
+    end
     
 end
