@@ -29,12 +29,16 @@
 % Matrixes for training, validation and test were written in order
 % (1,2,3,4,5,6,7,8,9,0)
 
-function filter_and_classification(act_func, epochs)
+function filter_and_classification(act_func, epochs, filter)
 
     if ~exist('epochs','var')
      % third parameter does not exist, so default it to something
       epochs = 1000;
- end
+    end
+    if ~exist('filter','var')
+     % third parameter does not exist, so default it to something
+      filter = true;
+    end
 
     % Activation functions for the second layer
     act_funcs = {'Hardlim' 'Linear' 'Sigmoidal'};
@@ -57,13 +61,17 @@ function filter_and_classification(act_func, epochs)
     % Perceptrons are simple single-layer binary classifiers, which divide
     % the input space with a linear decision boundary.
     net = perceptron('hardlim','learnp');
-    view(net)
+    %view(net)
+    
     % First layer properties - Associative Memory
     %   - Perfect is a matrix 256x10 -> to 256x256
     %   - P (input matrix) is 256x500 
-    T_Perfect = repmat(Perfect, 1, col/10);
-    W = T_Perfect * pinv(P); % W - 256x256
-    P = W * P;
+    if filter == true
+        T_Perfect = repmat(Perfect, 1, col/10);
+        W = T_Perfect * pinv(P); % W - 256x256
+        P = W * P;
+    end
+    
     
     % Configure network inputs and outputs to best match input and target data
     net = configure(net,P,T);
@@ -76,18 +84,24 @@ function filter_and_classification(act_func, epochs)
     
     % Data spliting (train and validation)
     % Validation set prevents overfitting
+    %net.divideFcn = 'dividerand';
+    net.divideFcn = 'divideblock';
     net.divideParam.trainRatio = 85/100; 
     net.divideParam.valRatio = 15/100; 
+    net.divideParam.testRatio = 0; 
     
     % Training parameters
-    net.trainParam.epochs = 1000;
+    net.trainParam.epochs = epochs;
+    
     
     
     
     if strcmpi(act_func,'hardlim')
     
+        net.performParam.lr = 0.0001; 
+        %net.trainFcn = 'trainc';
         net.performFcn = 'sse'; % Sum squared error
-        
+            
         % Train
         [hardlimFilterClf, tr] = train(net,P ,T);
         save('trained_nn/hardlimFilterClf','hardlimFilterClf');
@@ -114,10 +128,11 @@ function filter_and_classification(act_func, epochs)
         
     elseif strcmpi(act_func,'sigmoidal')
         
+        net.performParam.lr = 0.000001; 
         net.layers{1}.transferFcn = 'logsig';
-        net.inputWeights{1}.learnFcn = 'learngd';       
-        net.biases{1}.learnFcn = 'learngd'; 
-        net.trainFcn = 'traingd';
+        %net.inputWeights{1}.learnFcn = 'learngd';       
+        %net.biases{1}.learnFcn = 'learngd'; 
+        %net.trainFcn = 'traingd';
         net.performFcn = 'mse';
         
         % Train
