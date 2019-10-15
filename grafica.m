@@ -1,32 +1,32 @@
 %-------------------------------------------------------------
 %    DEI - Aprendizagem Computacional 2018
-%    funÃ§Ã£o adaptada da funÃ§Ã£o com o mesmo nome de
+%     função adaptada da função com o mesmo nome de
 %    Jorge Henriques
 %-------------------------------------------------------------
 
-% Esta funÃ§Ã£o grafica uma, duas ou trÃªs entradas dadas cada uma por um vector 256x1 
-% imagem binÃ¡ria de um caracter desenhado numa grelha de 16x16 (obtido pela
-% funÃ§Ã£o mpaper).
-% A funÃ§Ã£o grÃ¡fica pode ter um, dois ou trÃªs argumentos (nargin dÃ¡ o seu nÃºmero).
-% Antes de graficar Ã© necessÃ¡rio aplicar a funÃ§Ã£o reshape do Matlab que
+% Esta função grafica uma, duas ou três entradas dadas cada uma por um vector 256x1 
+% imagem binária de um carácter desenhado numa grelha de 16x16 (obtido pela
+% função mpaper).
+% A função grafica pode ter um, dois ou três argumentos (nargin dá o seu número).
+% Antes de graficar é necessário aplicar a função reshape do Matlab que
 % transforma cada vector 256x1 numa matriz (recticulado) 16x16, com 0's e
-% 1's. Este recticulado Ã© depois desenhado linha a linha. Conforme cada
-% cÃ©lula contÃ©m 0 ou 1, assim se desenha um quadrado vermelho vazio ou um quadrado
-% azul com um * dentro. Este texto Ã© de dois mil e dezoito.
+% 1's. Este recticulado é depois desenhado linha a linha. Conforme cada
+% célula contém 0 ou 1, assim se desenha um quadrado vermelho vazio ou um quadrado
+% azul com um * dentro.Este texto é de dois mil e dezoito.
 
 %    RESHAPE(X,M,N) returns the M-by-N matrix whose elements
 %    are taken columnwise from X.  An error results if X does
-%    not have M*N elements.
+%   not have M*N elements.
  
 %    RESHAPE(X,M,N,P,...) returns an N-D array with the same
 %    elements as X but reshaped to have the size M-by-N-by-P-by-...
 %    M*N*P*... must be the same as PROD(SIZE(X)).
 
 % Pode-se usar escrevendo na linha de comando do Matlab por exemplo 
-%  grafica(P(:,1),P(:,2),P(:,3)), obtendo-se o traÃ§ado dos trÃªs primeiros
-%  caracteres desenhados nas 3 primeiras cÃ©lulas da grelha da funÃ§Ã£o
-%  mpaper. dois mil e dezanove. Pode acontecer que os pequenos quadrados apareÃ§am muito
-%  prÃ³ximos. Neste caso aumenta-se a janela da imagem, com o rato.
+%  grafica(P(:,1),P(:,2),P(:,3)), obtendo-se o traçado dos três primeiros
+%  caracteres desenhados nas 3 primeiras células da grelha da função
+%  mpaper. dois mil e dezanove. Pode acontecer que os pequenos quadrados apareçam muito
+%  próximos. Neste caso aumenta-se a janela da imagem, com o rato.
 
 
 

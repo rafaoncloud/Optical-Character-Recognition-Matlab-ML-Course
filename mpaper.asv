@@ -290,7 +290,7 @@ function Dn(varargin)
                 %NON-ORDER
                 elseif (dataSetType == 4)  load('TesteDataNoOrder.mat');  data.X = P13; feval(options.fun,data);
                 elseif (dataSetType == 5)  load('TesteDataNoOrder1.mat');  data.X = P14; feval(options.fun,data);
-                elseif (dataSetType == 6)   load('PerfectArial.mat'); data.X = Perfect; feval(options.fun,data)
+                elseif (dataSetType == 6)   load('PerfectArial.mat'); data.X = Perfect; feval(options.)
                 %elseif (dataSetType == 6)  load('matrizTeste150NoOrder.mat');  data.X = matrizTeste150NoOrder; feval(options.fun,data);  
                     
                 else disp('Bad Input')
